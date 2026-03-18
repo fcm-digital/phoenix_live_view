@@ -153,16 +153,7 @@ defmodule Phoenix.LiveView.HTMLAlgebra do
       # We do not insert breaks when preserving.
       # We may insert spaces though if both sides are text.
       block_preserve?(prev_node) or block_preserve?(next_node) ->
-        cond do
-          preserved_text_owns_spacing?(prev_node, next_node) ->
-            ""
-
-          whitespace_between?(prev_node, next_node) ->
-            " "
-
-          true ->
-            ""
-        end
+        preserved_inline_break(prev_node, next_node)
 
       # If we have a block followed by anything that is not a tag,
       # we force a break.
@@ -172,6 +163,19 @@ defmodule Phoenix.LiveView.HTMLAlgebra do
       (text_ends_with_space?(prev_node) or text_starts_with_space?(next_node)) and
           not text_preserve?(prev_node) ->
         flex_break(" ")
+
+      true ->
+        ""
+    end
+  end
+
+  defp preserved_inline_break(prev_node, next_node) do
+    cond do
+      preserved_text_owns_spacing?(prev_node, next_node) ->
+        ""
+
+      whitespace_between?(prev_node, next_node) ->
+        " "
 
       true ->
         ""
